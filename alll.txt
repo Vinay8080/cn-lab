@@ -1,0 +1,324 @@
+import java.io.*;
+import java.net.InetAddress;
+public class Subnet1 {
+
+    public static void main(String[] args) throws IOException {
+   
+        System.out.println("ENTER IP:");
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String ip = br.readLine();
+        String checkclass = ip.substring(0, 3);
+
+
+
+        int cc = Integer.parseInt(checkclass);
+        String mask = null;
+        if(cc>0)
+        {
+            if(cc<=127)
+            {
+                mask = "255.0.0.0";
+        System.out.println("Class A IP Address");
+        System.out.println("SUBNET MASK:\n"+mask);
+            }
+            if(cc>=128 && cc<=191)
+            {
+                mask = "255.255.0.0";
+        System.out.println("Class B IP Address");
+        System.out.println("SUBNET MASK:\n"+mask);
+            }
+            if(cc>=192 && cc<=223)
+            {
+                mask = "255.255.255.0";
+        System.out.println("Class C IP Address");
+        System.out.println("SUBNET MASK:\n"+mask);
+            }
+        if(cc>=224 && cc<=239)
+            {
+        mask = "255.0.0.0";
+                System.out.println("Class D IP Address Used for multicasting");
+            }
+            if(cc>=240 && cc<=254)
+            {
+        mask = "255.0.0.0";
+                System.out.println("Class E IP Address Experimental Use");
+            }
+        }
+      
+
+        String networkAddr="";
+    String lastAddr="";
+        String[] ipAddrParts=ip.split("\\.");
+        String[] maskParts=mask.split("\\.");
+
+        for(int i=0;i<4;i++){
+        int x=Integer.parseInt(ipAddrParts[i]);
+        int y=Integer.parseInt(maskParts[i]);
+        int z=x&y;
+        networkAddr+=z+".";
+    int w=z|(y^255);
+    lastAddr+=w+".";
+        }
+   
+    System.out.println("First IP of block: "+networkAddr);
+    System.out.println("Last IP of block: "+lastAddr);
+   }
+
+}
+
+---------------------------------------------------------------------------------------------------------------------
+/import java.net.*;
+import java.util.*;
+
+public class IPDemo
+{
+ public static void main(String[] args){
+  String host;
+  Scanner ch = new Scanner(System.in);  
+  System.out.print("1.Enter Host Name \n2.Enter IP address \nChoice=");
+  int choice = ch.nextInt();
+  if(choice==1)
+  {  
+  Scanner input = new Scanner(System.in);
+  System.out.print("\n Enter host name: ");
+  host = input.nextLine();
+  try {
+   InetAddress address = InetAddress.getByName(host);
+   System.out.println("IP address: " + address.getHostAddress());
+   System.out.println("Host name : " + address.getHostName()); 
+   System.out.println("Host name and IP address: " + address.toString());
+  }
+  catch (UnknownHostException ex) {
+       System.out.println("Could not find " + host);
+  }
+  }
+  else
+  {
+  Scanner input = new Scanner(System.in);
+  System.out.print("\n Enter IP address: ");
+  host = input.nextLine();
+  try {
+   InetAddress address = InetAddress.getByName(host);
+   System.out.println("Host name : " + address.getHostName());   
+   System.out.println("IP address: " + address.getHostAddress());
+   System.out.println("Host name and IP address: " + address.toString());
+
+  }
+  catch (UnknownHostException ex) {
+       System.out.println("Could not find " + host);
+  }
+  }
+  
+ }
+}
+----------------------------------------------------------------------------------------------------------------
+
+import java.util.*; 
+
+public class Main{
+    static int xor(int x,int y){
+        if(x==y)
+        return 0;
+        return 1;
+    }
+
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+
+        int frame_bits;
+        int  gen_bits;
+
+        System.out.print("Enter No. of bits in frame : ");
+        frame_bits = sc.nextInt();
+        System.out.print("Enter No. of bits in Generator : ");
+        gen_bits = sc.nextInt();
+
+        int frame[] = new int[frame_bits];
+        int gen[] = new int[gen_bits];
+        int f1[] = new int[frame_bits+gen_bits-1];
+        System.out.println("Enter Frame  : ");
+        for(int i=0; i<frame_bits; i++){
+            System.out.print("Bit - " + i + " : ");
+            frame[i] = sc.nextInt();
+            f1[i]=frame[i];
+        }
+
+        System.out.println("Enter Generator : ");
+        for(int i=0; i<gen_bits; i++){
+            System.out.print("Bit - " + i + " : ");
+            gen[i] = sc.nextInt();
+        }
+        for(int i=0; i<(gen_bits-1); i++)
+        {
+            f1[frame_bits + i] = 0;
+        } 
+        int k = frame_bits + gen_bits -1 ;
+        for(int i=0; i<(k-3); i++)
+        {
+            for(int j=i; j<(i+gen_bits); j++){
+                f1[j] = xor(f1[j],gen[j-i]);
+            }
+            for(i=0; i<k; i++){
+                if(f1[i]==1){
+                    i--;
+                    break;
+                }
+            }
+        } 
+   // 8 4 1 0 1 1 1 0 1 0 1 0 0 1 
+      
+      System.out.println("");
+        System.out.print(" CRC : ");
+        for(int i=frame_bits; i<(frame_bits+gen_bits-1); i++)
+        {
+            System.out.print(f1[i]);
+        }
+
+      for(int i=0; i<frame_bits; i++)
+        {
+          f1[i] = frame[i];
+        }
+
+       for(int i=0; i<(k-3); i++)
+        {
+            for(int j=i; j<(i+gen_bits); j++){
+                f1[j] = xor(f1[j],gen[j-i]);
+            }
+            for(i=0; i<k; i++){
+                if(f1[i]==1){
+                    i--;
+                    break;
+                }
+            }
+        } 
+      System.out.println("");
+      System.out.print(" Remainder : ");
+      int cnt=0;
+        for(int i=frame_bits; i<(frame_bits+gen_bits-1); i++)
+        {
+            System.out.print(f1[i]);
+          if(f1[i]==0)
+            cnt++;
+        }
+      if(cnt==3)
+        System.out.println(" Frame ACCEPTED ");
+      else    
+        System.out.println(" Frame REJECTED ");
+    } 
+}
+---------------------------------------------------------------------------------------------------------------------------
+#include <iostream>
+using namespace std;
+
+int main() {
+  cout<<"**********************************"<<endl;
+  cout<<"CRC PROGRAM"<<endl;
+  cout<<"**********************************"<<endl;
+  int frame[20];
+  int crc1[20], fs, cs, crc[20];
+  cout << "Enter the frame size :";
+  cin >> fs;
+
+  cout << "Enter the frame :";
+  for (int i = 0; i < fs; i++)
+    cin >> frame[i];
+
+  cout << "Enter the generator size :";
+  cin >> cs;
+
+  cout << "Enter the bits of crc generator:";
+  for (int i = 0; i < cs; i++) 
+    cin >> crc1[i];
+  
+
+  int rs = cs - 1;
+  cout << "Number of '0' appended is:" << rs << endl;
+  for (int i = fs; i < (fs + rs); i++) 
+    frame[i] = 0;
+  
+
+  cout << "Message after appending '0' is:";
+  for (int i = 0; i < (fs + rs); i++) 
+    cout << frame[i] << " ";
+  
+  cout << endl;
+  int i, j, k;
+  int temp[20];
+
+  for (int i = 0; i < (fs + rs); i++) 
+    temp[i] = frame[i];
+  
+
+  for (i = 0; i < fs; i++) {
+    j = 0;
+    k = i;
+
+    if (temp[k] == crc1[j]) {
+      for (j = 0, k = i; j < cs; j++, k++) {
+        if (temp[k] == crc1[j]) 
+          temp[k] = 0;
+         else 
+          temp[k] = 1;
+     }
+    }
+  }
+
+  for (int i = 0; i < rs; i++) 
+    crc[i] = temp[fs + i];
+  
+   cout << "Crc bits are:";
+  for (int i = 0; i < rs; i++) 
+    cout << crc[i] << " "<<endl;
+  
+  
+  for (int i = 0; i < rs; i++) {
+    frame[fs + i] = crc[i];
+  }
+
+  cout << "Message to be transmited: ";
+  for (int i = 0; i < (fs + rs); i++) {
+    cout << frame[i] << " ";
+  }
+  cout << endl;
+
+  int rec[20];
+  cout << "Enter the recieved mesage :";
+  for (int i = 0; i < (fs + rs); i++) {
+    cin >> rec[i];
+  }
+
+  for (i = 0; i < fs; i++) {
+    j = 0;
+    k = i;
+
+    if (rec[k] == crc1[j]) {
+      for (j = 0, k = i; j < cs; j++, k++) {
+        if (rec[k] == crc1[j]) {
+          rec[k] = 0;
+        } else {
+          rec[k] = 1;
+        }
+      }
+    }
+  }
+  int temp2[cs - 1];
+
+  cout << endl;
+  for (int i = 0; i < cs; i++) {
+    temp2[i] = rec[cs + i];
+  }
+  int m;
+  for (m = 0; m < cs; m++) {
+    if (temp2[m] != 0) {
+      cout << "Data Rejected" << endl;
+      break;
+    }
+  }
+
+  if (m == cs)
+    cout << "Data Accepted" << endl;
+
+  return 0;
+}
+------------------------------------------------------------------------------------------------------------------------------------------
+
